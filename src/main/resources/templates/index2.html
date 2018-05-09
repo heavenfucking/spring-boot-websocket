@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>玩转spring boot——websocket</title>
+<script src="//cdn.bootcss.com/angular.js/1.5.6/angular.min.js"></script>
+<script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.min.js"></script>
+<script type="text/javascript">
+    var websocket = new SockJS("/webServer");
+    var stompClient = Stomp.over(websocket);
+
+    //建立websocket连接
+    function openWs(){
+        stompClient.connect({}, function(frame) {
+            stompClient.subscribe('/topic/message',  function(data) { //订阅消息
+                console.log("收到topic消息："+data.body);//body中为具体消息内容
+            });
+            stompClient.subscribe('/user/message', function(message){
+                console.log("收到session消息："+message.body);//body中为具体消息内容
+            });
+        });
+    }
+    //关闭连接
+    function wsClose() {
+        websocket.close();
+    }
+
+    function sendws() {
+        stompClient.send("/app/message", {}, JSON.stringify({
+            name: "nane",
+            msg: "发送的消息aaa"
+        }));
+    }
+    openWs();
+</script>
+</head>
+<body>
+<input value="openWs" id="sendws" type="button" onclick="sendws()"/>
+</body>
+</html>
